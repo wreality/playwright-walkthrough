@@ -1,0 +1,14 @@
+{
+  "name": "playwright-walkthrough",
+  "owner": {
+    "name": "Brian Adams",
+    "email": "wreality@gmail.com"
+  },
+  "plugins": [
+    {
+      "name": "playwright-walkthrough",
+      "source": "./",
+      "description": "Scaffold Playwright-driven walkthrough videos — chapter cards, fake cursor, Driver.js spotlight, smooth scrolling."
+    }
+  ]
+}

@@ -1,0 +1,134 @@
+/**
+ * playwright-walkthrough spec template.
+ *
+ * Copy to `<tests-dir>/walkthrough/<feature>.spec.ts` and fill the
+ * TODO blocks. Each scene is a small async helper; the top-level
+ * `test(...)` is the storyboard.
+ *
+ * Requires Playwright >= 1.59 (for the `page.screencast` API) and
+ * `driver.js` in devDependencies.
+ */
+
+import { test, type Page } from "@playwright/test"
+// If your project has a base fixture with auth helpers, import from
+// that instead (so login fixtures are available to scenes):
+//   import { test, type Page } from "@fixtures/base"
+import {
+  clearSpotlight,
+  highlight,
+  installOverlay,
+  pause,
+  smoothScrollTo,
+} from "./overlay"
+
+// HD viewport for a presentable recording.
+test.use({
+  viewport: { width: 1440, height: 900 },
+})
+
+// Budget roughly sceneCount × 30s + 60s. The default 30s will fire
+// mid-recording.
+test.setTimeout(5 * 60_000)
+
+// ---------------------------------------------------------------------------
+// Scenes
+// ---------------------------------------------------------------------------
+
+/**
+ * Scene 1 — orientation. Spotlight the big regions with
+ * `highlight()`; successive calls animate the cutout to the next
+ * target automatically. Ends with `clearSpotlight` so the next
+ * scene's clicks show the cursor.
+ */
+async function showIntro(page: Page): Promise<void> {
+  await page.screencast.showChapter("TODO: headline", {
+    description: "TODO: one-sentence value prop",
+    duration: 2000,
+  })
+
+  const region = page.locator("TODO-main-region-selector").first()
+  if (await region.isVisible()) {
+    await smoothScrollTo(page, region)
+    await highlight(page, region, { hold: 1500 })
+  }
+
+  // Walk 2-4 sub-regions. No clearSpotlight between them — highlight
+  // animates from one target to the next.
+  for (const selector of [
+    "TODO-subregion-1",
+    "TODO-subregion-2",
+    "TODO-subregion-3",
+  ]) {
+    const target = page.locator(selector).first()
+    if (await target.isVisible()) {
+      await smoothScrollTo(page, target, 350)
+      await highlight(page, target, { hold: 900 })
+    }
+  }
+
+  await clearSpotlight(page)
+}
+
+/**
+ * Interaction scenes — drive the cursor through a flow. Use
+ * `showChapter` at the start for a title card and `pause` between
+ * beats so the viewer can follow.
+ */
+async function demoInteraction(page: Page): Promise<void> {
+  await page.screencast.showChapter("TODO: scene 2 title", {
+    description: "TODO: what this demonstrates",
+    duration: 1800,
+  })
+
+  const button = page.getByRole("button", { name: /TODO/i }).first()
+  await smoothScrollTo(page, button)
+  await pause(page, 500)
+  await button.click()
+  await page.waitForLoadState("networkidle")
+  await pause(page, 1500)
+}
+
+// ---------------------------------------------------------------------------
+// Test entry
+// ---------------------------------------------------------------------------
+
+test("feature walkthrough", async ({ page }, testInfo) => {
+  // Install overlays BEFORE any navigation so Driver.js + cursor
+  // injection run on every document load via addInitScript.
+  await installOverlay(page)
+
+  // TODO: replace with the project's login fixture if one exists, or
+  // keep the direct goto for public pages.
+  await page.goto("/TODO-starting-path")
+  await page.waitForLoadState("networkidle")
+
+  // Start recording. `testInfo.outputPath` lands the file in the
+  // per-test directory under test-results/, which survives across
+  // scenes but gets wiped on the next `playwright test` run — copy
+  // the file out after a successful take.
+  const videoPath = testInfo.outputPath("walkthrough.webm")
+  await page.screencast.start({
+    path: videoPath,
+    size: { width: 1440, height: 900 },
+  })
+
+  // Optional: render action annotations (the little labels next to
+  // each click/fill) throughout the recording. Omit for a cleaner
+  // look, or set position per taste.
+  await page.screencast.showActions({
+    position: "bottom-right",
+    duration: 700,
+    fontSize: 18,
+  })
+
+  await showIntro(page)
+  await demoInteraction(page)
+  // TODO: add more scenes here.
+
+  await page.screencast.showChapter("That's the tour", {
+    description: "Thanks for watching",
+    duration: 2000,
+  })
+
+  await page.screencast.stop()
+})
