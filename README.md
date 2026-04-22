@@ -2,6 +2,10 @@
 
 A Claude Code plugin that scaffolds **Playwright-driven walkthrough videos** of a web app — polished `.webm` tours you can drop into a PR description, release note, or stakeholder email.
 
+<video src="https://github.com/wreality/playwright-walkthrough/releases/download/assets/walkthrough.webm" controls width="720"></video>
+
+> [Watch the example walkthrough.webm](https://github.com/wreality/playwright-walkthrough/releases/download/assets/walkthrough.webm) (if the embed doesn't render)
+
 It's an opinionated wrapper on top of Playwright 1.59+'s native `page.screencast` API. The plugin provides:
 
 - Chapter cards between scenes (Playwright native)
