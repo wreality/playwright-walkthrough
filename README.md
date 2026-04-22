@@ -14,7 +14,7 @@ It's an opinionated wrapper on top of Playwright 1.59+'s native `page.screencast
 
 ```
 /plugin marketplace add wreality/playwright-walkthrough
-/plugin install playwright-walkthrough@wreality-playwright-walkthrough
+/plugin install playwright-walkthrough@wreality
 ```
 
 Then ask Claude something like:
